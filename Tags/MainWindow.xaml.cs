@@ -52,26 +52,19 @@ namespace Tags
             var helper = new WindowInteropHelper(this);
             const uint VK_F10 = 0x79;
             const uint MOD_CTRL = 0x0002;
-            if (!RegisterHotKey(helper.Handle, HOTKEY_ID, MOD_CTRL, VK_F10))
+            if (!RegisterHotKey(helper.Handle, HOTKEY_ID, (uint)settings.hotkey_mod, (uint)settings.hotkey_key))
             {
-                // handle error
+                MessageBox.Show("Key registration failed! It is probably already taken!");
             }
         }
         
-private void UnregisterHotKey()
-{
-    var helper = new WindowInteropHelper(this);
-    UnregisterHotKey(helper.Handle, HOTKEY_ID);
-}
-
-        enum KeyModifier
+        private void UnregisterHotKey()
         {
-            None = 0,
-            Alt = 1,
-            Control = 2,
-            Shift = 4,
-            WinKey = 8
+            var helper = new WindowInteropHelper(this);
+            UnregisterHotKey(helper.Handle, HOTKEY_ID);
         }
+
+        SettingsLoader settings = new SettingsLoader();
 
         public MainWindow()
         {
