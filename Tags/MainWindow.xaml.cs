@@ -64,7 +64,7 @@ namespace Tags
         }
 
         SettingsLoader settings = new SettingsLoader();
-        List<Button> buttons = new List<Button>();
+        List<Button> buttons = new List<Button>(); // is used when moving window on hotkey
 
         public MainWindow()
         {
@@ -73,6 +73,7 @@ namespace Tags
             Width = settings.width;
             Height = settings.height;
 
+            // Add buttons with correspondences to tags
             foreach (var tag in settings.Tags) {
                 Button btn = new Button();
                 btn.Content = tag.Text;
@@ -93,7 +94,7 @@ namespace Tags
                 Application.Current.Shutdown();
             }
 
-            CompositionTarget.Rendering += CompositionTarget_Rendering;
+            //CompositionTarget.Rendering += CompositionTarget_Rendering;
         }
 
         [DllImport("user32.dll")]
@@ -112,7 +113,7 @@ namespace Tags
         }
 
         private void CompositionTarget_Rendering(object sender, EventArgs e) {
-            Title = GetMousePosition().ToString() + " - " + Left + "; " + Top;
+            //Title = GetMousePosition().ToString() + " - " + Left + "; " + Top;
         }
 
         private void Btn_Click(object sender, RoutedEventArgs e) {
@@ -151,16 +152,24 @@ namespace Tags
         }
 
         private void OnHotKeyPressed() {
-            if (WindowState == WindowState.Minimized) {
-                WindowState = WindowState.Normal;
+            if (Visibility == Visibility.Hidden || WindowState == WindowState.Minimized) {
+                if (WindowState == WindowState.Minimized)
+                    WindowState = WindowState.Normal;
+
+                Visibility = Visibility.Visible;
                 Activate();
 
+                // Change window location such that first button is right under the cursor
                 if (settings.moveToCursor) {
-                    var pt = GetMousePosition();
+                    var pt = GetMousePosition(); // get global mouse position
+
+                    // Transform to 1/96 inch units, which r used in all these left, top, width, height properties
                     double x, y;
                     TransformToLogicalUnits(this, (int)pt.X, (int)pt.Y, out x, out y);
                     var btn = buttons.First();
-                    var btnPoint = TranslatePoint(new Point(), btn);
+                    var btnPoint = TranslatePoint(new Point(), btn); // get top-left corner
+
+                    // Change location
                     Left = x - btnPoint.X - btn.ActualWidth / 2;
                     Top = y - SystemParameters.CaptionHeight + btnPoint.Y - btn.ActualHeight / 2;
                 }
@@ -168,13 +177,13 @@ namespace Tags
                 return;
             }
             if (settings.toogleVisibility) {
-                WindowState = WindowState.Minimized;
+                Visibility = Visibility.Hidden;
             }
         }
 
         /// <summary>
         /// Transforms device independent units (1/96 of an inch)
-        /// to pixels
+        /// to pixels https://dzimchuk.net/efficient-way-to-position-windows-in-wpf/
         /// </summary>
         /// <param name="visual">a visual object</param>
         /// <param name="unitX">a device independent unit value X</param>

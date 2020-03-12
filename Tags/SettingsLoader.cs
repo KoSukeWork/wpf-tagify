@@ -152,6 +152,7 @@ namespace Tags
             { "tooglevisibility",    true },
             { "movetocursor",    true },
         };
+        private TagSettings defaultTag = new TagSettings("test_tag", "Test tag", "#b851e8");
 
         private Dictionary<string, object> settings = null;
 
@@ -244,6 +245,15 @@ namespace Tags
                                          data[sname]["color"]));
             }
 
+            // Add default tag if necessary
+            if (Tags.Count == 0) {
+                Tags.Add(defaultTag);
+                string sect = "tag:" + defaultTag.Tag;
+                data.Sections.AddSection(sect);
+                data[sect].AddKey("tag", defaultTag.Tag);
+                data[sect].AddKey("text", defaultTag.Text);
+                data[sect].AddKey("color", defaultTag.Color);
+            }
 
             // Save generated data
             fileParser.WriteFile(path, data);
