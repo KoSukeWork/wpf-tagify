@@ -17,14 +17,15 @@ namespace WindowsExplorerSelectedFiles
             ArrayList selected = new ArrayList();
             ShellWindows winClass = new ShellWindows();
             int cnt = 1;
-            foreach (SHDocVw.InternetExplorer window in winClass)
+            foreach (InternetExplorer window in winClass)
             {
                 filename = Path.GetFileNameWithoutExtension(window.FullName).ToLower();
                 if (filename.ToLowerInvariant() == "explorer")
                 {
                     Console.WriteLine("Windows Explorer Instance #{0}:", cnt++);
-                    Shell32.FolderItems items = ((Shell32.IShellFolderViewDual2)window.Document).SelectedItems();
-                    foreach (Shell32.FolderItem item in items)
+                    Console.WriteLine(((IShellFolderViewDual2)window.Document).Folder.Title.ToString());
+                    FolderItems items = ((IShellFolderViewDual2)window.Document).SelectedItems();
+                    foreach (FolderItem item in items)
                         selected.Add(item.Path);
                     if (selected.Count > 0)
                         foreach (var path in selected)

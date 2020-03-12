@@ -36,10 +36,11 @@
     <Grid>
         <ScrollViewer HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Height="Auto" VerticalScrollBarVisibility="Auto">
             <DockPanel HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Height="Auto">
-                <StackPanel>
-                    <Button x:Name="btnFrisbee" Style="{StaticResource MyButton}" Content="Frisbee" Height="48" VerticalAlignment="Top" BorderBrush="{x:Null}" Background="#FFB3FFA0" FontSize="16"/>
+                <StackPanel x:Name="stackPanel">
+                    <!--<Button x:Name="btnFrisbee" Style="{StaticResource MyButton}" Content="Frisbee" Height="48" VerticalAlignment="Top" BorderBrush="{x:Null}" Background="#FFB3FFA0" FontSize="16"/>
                     <Button Style="{StaticResource MyButton}" Content="Crocodile" Height="48" VerticalAlignment="Top" BorderBrush="{x:Null}" Background="#FFECF78F" FontSize="16"/>
                     <Button x:Name="btnTower" Style="{StaticResource MyButton}" Content="Tower" Height="48" VerticalAlignment="Top" BorderBrush="{x:Null}" Background="#FFB0A0FF" FontSize="16"/>
+                    -->
                     <ListBox/>
                 </StackPanel>
             </DockPanel>

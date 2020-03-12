@@ -50,11 +50,9 @@ namespace Tags
         private void RegisterHotKey()
         {
             var helper = new WindowInteropHelper(this);
-            const uint VK_F10 = 0x79;
-            const uint MOD_CTRL = 0x0002;
             if (!RegisterHotKey(helper.Handle, HOTKEY_ID, (uint)settings.hotkey_mod, (uint)settings.hotkey_key))
             {
-                MessageBox.Show("Key registration failed! It is probably already taken!");
+                MessageBox.Show("Hotkey registration failed! It has probably already been taken by some other app. Please assign other keystroke in 'settings.ini'.", "Error registering hotkey", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         
@@ -70,13 +68,44 @@ namespace Tags
         {
             InitializeComponent();
 
-            btnTower.Click += BtnTower_Click;
+            Width = settings.width;
+            Height = settings.height;
+
+            foreach (var tag in settings.Tags) {
+                Button btn = new Button();
+                btn.Content = tag.Text;
+                btn.Height = 48;
+                btn.FontSize = 16;
+                btn.BorderBrush = Brushes.Transparent;
+                btn.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(tag.Color));
+                btn.Style = FindResource("MyButton") as Style;
+                btn.Tag = tag;
+                btn.Click += Btn_Click;
+
+                stackPanel.Children.Add(btn);
+            }
+
+            if (settings.Tags.Count == 0) {
+                MessageBox.Show("There are no tags found. Please add your tags as [tag:my_tag] in 'settings.ini'");
+                Application.Current.Shutdown();
+            }
         }
 
-        private void BtnTower_Click(object sender, RoutedEventArgs e)
-        {
-            btnFrisbee.Content = "Heyhey";
-            WindowState = WindowState.Maximized;
+        private void Btn_Click(object sender, RoutedEventArgs e) {
+            var paths = WExplorerAPI.GetExplorerFiles();
+
+            Button btn = (Button)sender;
+            TagSettings tag = (TagSettings)btn.Tag;
+
+            int total = 0;
+            foreach(var path in paths) {
+                total += path.Paths.Count;
+            }
+
+            MessageBox.Show(string.Format("Tag: '{0}' is going to be added to {1} files in {2} instances of Windows Explorer", tag.Tag, total, paths.Count));
+
+            if (settings.hideOnClick)
+                WindowState = WindowState.Minimized;
         }
 
         private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -97,11 +126,15 @@ namespace Tags
             return IntPtr.Zero;
         }
 
-        private void OnHotKeyPressed()
-        {
-            btnFrisbee.Content = "Heyhey2";
-            WindowState = WindowState.Normal;
-            Activate();
+        private void OnHotKeyPressed() {
+            if (WindowState == WindowState.Minimized) {
+                WindowState = WindowState.Normal;
+                Activate();
+                return;
+            }
+            if (settings.toogleVisibility) {
+                WindowState = WindowState.Minimized;
+            }
         }
     }
 }
