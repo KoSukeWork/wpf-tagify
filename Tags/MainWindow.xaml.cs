@@ -130,7 +130,7 @@ namespace Tags
             MessageBox.Show(string.Format("Tag: '{0}' is going to be added to {1} files in {2} instances of Windows Explorer", tag.Tag, total, paths.Count));
 
             if (settings.hideOnClick)
-                WindowState = WindowState.Minimized;
+                Visibility = Visibility.Hidden;
         }
 
         private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
