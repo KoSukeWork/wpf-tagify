@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using System.Windows.Interop;
 using System.Runtime.InteropServices;
 
@@ -63,6 +64,7 @@ namespace Tags
         }
 
         SettingsLoader settings = new SettingsLoader();
+        List<Button> buttons = new List<Button>();
 
         public MainWindow()
         {
@@ -83,12 +85,34 @@ namespace Tags
                 btn.Click += Btn_Click;
 
                 stackPanel.Children.Add(btn);
+                buttons.Add(btn);
             }
 
             if (settings.Tags.Count == 0) {
                 MessageBox.Show("There are no tags found. Please add your tags as [tag:my_tag] in 'settings.ini'");
                 Application.Current.Shutdown();
             }
+
+            CompositionTarget.Rendering += CompositionTarget_Rendering;
+        }
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetCursorPos(ref Win32Point pt);
+
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct Win32Point {
+            public Int32 X;
+            public Int32 Y;
+        };
+        public static Point GetMousePosition() {
+            Win32Point w32Mouse = new Win32Point();
+            GetCursorPos(ref w32Mouse);
+            return new Point(w32Mouse.X, w32Mouse.Y);
+        }
+
+        private void CompositionTarget_Rendering(object sender, EventArgs e) {
+            Title = GetMousePosition().ToString() + " - " + Left + "; " + Top;
         }
 
         private void Btn_Click(object sender, RoutedEventArgs e) {
@@ -130,11 +154,46 @@ namespace Tags
             if (WindowState == WindowState.Minimized) {
                 WindowState = WindowState.Normal;
                 Activate();
+
+                if (settings.moveToCursor) {
+                    var pt = GetMousePosition();
+                    double x, y;
+                    TransformToLogicalUnits(this, (int)pt.X, (int)pt.Y, out x, out y);
+                    var btn = buttons.First();
+                    var btnPoint = TranslatePoint(new Point(), btn);
+                    Left = x - btnPoint.X - btn.ActualWidth / 2;
+                    Top = y - SystemParameters.CaptionHeight + btnPoint.Y - btn.ActualHeight / 2;
+                }
+
                 return;
             }
             if (settings.toogleVisibility) {
                 WindowState = WindowState.Minimized;
             }
+        }
+
+        /// <summary>
+        /// Transforms device independent units (1/96 of an inch)
+        /// to pixels
+        /// </summary>
+        /// <param name="visual">a visual object</param>
+        /// <param name="unitX">a device independent unit value X</param>
+        /// <param name="unitY">a device independent unit value Y</param>
+        /// <param name="pixelX">returns the X value in pixels</param>
+        /// <param name="pixelY">returns the Y value in pixels</param>
+        public void TransformToLogicalUnits(Visual visual, int pixelX, int pixelY, out double unitX, out double unitY) {
+            Matrix matrix;
+            var source = PresentationSource.FromVisual(visual);
+            if (source != null) {
+                matrix = source.CompositionTarget.TransformFromDevice;
+            } else {
+                using (var src = new HwndSource(new HwndSourceParameters())) {
+                    matrix = src.CompositionTarget.TransformFromDevice;
+                }
+            }
+
+            unitX = (int)(matrix.M11 * pixelX);
+            unitY = (int)(matrix.M22 * pixelY);
         }
     }
 }

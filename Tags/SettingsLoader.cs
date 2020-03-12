@@ -129,15 +129,16 @@ namespace Tags
                             { "f21",            0x84 },
                             { "f22",            0x85 },
                             { "f23",            0x86 },
-                            { "f24",            0x87 },
-                            { "numlock",        0x90 },
-                            { "scrolllock",     0x91 } } },
+                            { "f24",            0x87 } } },
             { "hideonclick", new Dictionary<string, object>() {
                             { "true",   true },
                             { "false",  false } } },
             { "width", null },
             { "height", null },
             { "tooglevisibility", new Dictionary<string, object>() {
+                            { "true",   true },
+                            { "false",  false } } },
+            { "movetocursor", new Dictionary<string, object>() {
                             { "true",   true },
                             { "false",  false } } },
         };
@@ -149,6 +150,7 @@ namespace Tags
             { "width",              256 },
             { "height",             256 },
             { "tooglevisibility",    true },
+            { "movetocursor",    true },
         };
 
         private Dictionary<string, object> settings = null;
@@ -160,6 +162,7 @@ namespace Tags
         public int hotkey_key { get { return (int)settings["key"]; } }
         public bool hideOnClick { get { return (bool)settings["hideonclick"]; } }
         public bool toogleVisibility { get { return (bool)settings["tooglevisibility"]; } }
+        public bool moveToCursor { get { return (bool)settings["movetocursor"]; } }
 
         public int width { get { return int.Parse(settings["width"].ToString()); } }
         public int height { get { return int.Parse(settings["height"].ToString()); } }

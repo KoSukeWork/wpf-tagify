@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Tags"
         mc:Ignorable="d"
         Title="Tag selector" Height="384" Width="256">
-    
+
     <Window.Resources>
         <Style x:Key="MyButton" TargetType="Button">
             <Setter Property="OverridesDefaultStyle" Value="True" />
@@ -28,12 +28,7 @@
         </Style>
     </Window.Resources>
 
-    <Window.InputBindings>
-        <KeyBinding Command="ApplicationCommands.Open"
-              Gesture="CTRL+R" />
-    </Window.InputBindings>
-
-    <Grid>
+    <Grid x:Name="grid">
         <ScrollViewer HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Height="Auto" VerticalScrollBarVisibility="Auto">
             <DockPanel HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Height="Auto">
                 <StackPanel x:Name="stackPanel">
